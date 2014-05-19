@@ -1,4 +1,6 @@
-#canvas_container {
+#canvas {
+  width: 500px;
+  height: 800px;
   border: 1px solid black;
   display: inline-block;
 }

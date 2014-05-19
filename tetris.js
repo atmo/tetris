@@ -51,13 +51,17 @@ var x, y;
 var width = 500,
     height = 800;
 
+window.onload = init();
+
+
 function init() {
     canvas = document.getElementById('canvas');
+
     canvas.width = width;
     canvas.height = height;
 
     x = width / 2;
-    y = 2 * pixel;
+    y = -2 * pixel;
     context = canvas.getContext('2d');
     run();
 }
@@ -65,10 +69,10 @@ function init() {
 function run() {
     context.fillStyle = "white";
     context.fillRect(0, 0, width, height);
-    var figureId = 1;
+    var figureId = 6;
     draw(context, figureId, x, y);
     y += pixel;
-    setTimeout(run, 500);
+    setTimeout(run, 200);
 }
 
 function draw(context, id, x, y) {
