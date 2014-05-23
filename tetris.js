@@ -1,7 +1,10 @@
-var pixel = 20;
+var pixel = 40;
 var canvas, context;
 
 var figure;
+var width = 10,
+	height = 15;
+var width, height;
 
 var figuresCount = 7;
 
@@ -10,17 +13,13 @@ window.onload = init();
 
 function init() {
 	canvas = document.getElementById("canvas");
-	width = canvas.clientWidth;
-	height = canvas.clientHeight;
-	canvas.width = width;
-	canvas.height = height;
+	canvas.width = width * pixel;
+	canvas.height = height * pixel;
 
 	document.addEventListener("keydown", onKeyPressed);
 
 	context = canvas.getContext('2d');
-	figure = new Figure(Math.floor(Math.random() * figuresCount), canvas.width / 2, -2 * pixel, pixel);
-
-
+	figure = new Figure(Math.floor(Math.random() * figuresCount), 1, -2, pixel);
 
 	setInterval(run, 400);
 }
@@ -30,19 +29,25 @@ function run() {
 	context.fillRect(0, 0, canvas.width, canvas.height);
 
 	figure.draw(context);
-	figure.step();
+	figure.drop();
 }
 
 function onKeyPressed(event) {
 	switch (event.keyCode) {
 		case 37: // left
 			figure.moveLeft();
+			if (figure.checkBound(width))
+				figure.moveRight();
 			break;
 		case 39: // right
 			figure.moveRight();
+			if (figure.checkBound(width))
+				figure.moveLeft();
 			break;
 		case 38: // up
 			figure.rotate();
+			if (figure.checkBound(width))
+				figure.rotate(true);
 			break;
 		case 40: //down
 			figure.drop();
@@ -56,7 +61,6 @@ function Figure(id, x, y, pixel) {
 	this.y = y;
 	this.back = false;
 	this.pixel = pixel;
-
 	this.bodies = [
 		[
 			[0, -1], // O
@@ -101,37 +105,44 @@ function Figure(id, x, y, pixel) {
 			[-1, 0]
 		],
 	];
-	this.body = this.bodies[id];
+	this.body = this.bodies[this.id];
 
 
 	this.draw = function(context) {
 		context.fillStyle = "black";
+		context.strokeStyle = "white";
 		for (var i = 0; i < this.body.length; ++i) {
-			context.fillRect(x + this.body[i][0] * pixel, y + this.body[i][1] * pixel, pixel, pixel);
+			context.fillRect((x + this.body[i][0]) * pixel, (y + this.body[i][1]) * pixel, pixel, pixel);
+			context.strokeRect((x + this.body[i][0]) * pixel, (y + this.body[i][1]) * pixel, pixel, pixel);
 		}
 	}
 
-	this.step = function(context) {
-		y += pixel;
+	this.checkBound = function(width) {
+		for (var i = 0; i < this.body.length; ++i) {
+			if (x + this.body[i][0] < 0 || x + this.body[i][0] >= width)
+				return true;
+		}
+		return false;
 	}
 
 	this.moveLeft = function() {
-		x = x > pixel ? x - pixel : 0;
+		--x;
 	}
 
 	this.moveRight = function() {
-		x = x + pixel < width ? x + pixel : width - pixel;
+		++x;
 	}
 
-	this.rotate = function() {
+	this.rotate = function(back) {
+		back = this.back || back;
 		for (var i = 0; i < this.body.length; ++i) {
-			this.body[i] = this.back ? [-this.body[i][1], this.body[i][0]] : [this.body[i][1], -this.body[i][0]];
+			this.body[i] = back ? [-this.body[i][1], this.body[i][0]] : [this.body[i][1], -this.body[i][0]];
 		}
 		if (this.id == 3 || this.id == 4 || this.id == 5)
 			this.back = !this.back;
 	}
 
 	this.drop = function() {
-		y += pixel;
+		++y;
 	}
 }
