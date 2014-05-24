@@ -19,7 +19,7 @@ function init() {
 	document.addEventListener("keydown", onKeyPressed);
 
 	context = canvas.getContext('2d');
-	figure = new Figure(Math.floor(Math.random() * figuresCount), 1, -2, pixel);
+	figure = new Figure();
 
 	setInterval(run, 400);
 }
@@ -30,6 +30,13 @@ function run() {
 
 	figure.draw(context);
 	figure.drop();
+}
+
+function drawPixel(x, y) {
+	context.fillStyle = "black";
+	context.strokeStyle = "white";
+	context.fillRect(x * pixel, y * pixel, pixel, pixel);
+	context.strokeRect(x * pixel, y * pixel, pixel, pixel);
 }
 
 function onKeyPressed(event) {
@@ -55,13 +62,13 @@ function onKeyPressed(event) {
 	}
 }
 
-function Figure(id, x, y, pixel) {
-	this.id = id;
-	this.x = x;
-	this.y = y;
-	this.back = false;
-	this.pixel = pixel;
-	this.bodies = [
+function Figure() {
+	var id = Math.floor(Math.random() * figuresCount);
+	var x = width / 2;
+	var y = 0;
+	var back = false;
+	var pixel = pixel;
+	var bodies = [
 		[
 			[0, -1], // O
 			[0, 0], //  O
@@ -105,21 +112,17 @@ function Figure(id, x, y, pixel) {
 			[-1, 0]
 		],
 	];
-	this.body = this.bodies[this.id];
+	var body = bodies[id];
 
-
-	this.draw = function(context) {
-		context.fillStyle = "black";
-		context.strokeStyle = "white";
-		for (var i = 0; i < this.body.length; ++i) {
-			context.fillRect((x + this.body[i][0]) * pixel, (y + this.body[i][1]) * pixel, pixel, pixel);
-			context.strokeRect((x + this.body[i][0]) * pixel, (y + this.body[i][1]) * pixel, pixel, pixel);
+	this.draw = function() {
+		for (var i = 0; i < body.length; ++i) {
+			drawPixel(x + body[i][0], y + body[i][1]);
 		}
 	}
 
 	this.checkBound = function(width) {
-		for (var i = 0; i < this.body.length; ++i) {
-			if (x + this.body[i][0] < 0 || x + this.body[i][0] >= width)
+		for (var i = 0; i < body.length; ++i) {
+			if (x + body[i][0] < 0 || x + body[i][0] >= width)
 				return true;
 		}
 		return false;
@@ -133,13 +136,13 @@ function Figure(id, x, y, pixel) {
 		++x;
 	}
 
-	this.rotate = function(back) {
-		back = this.back || back;
-		for (var i = 0; i < this.body.length; ++i) {
-			this.body[i] = back ? [-this.body[i][1], this.body[i][0]] : [this.body[i][1], -this.body[i][0]];
+	this.rotate = function(b) {
+		back = back || b;
+		for (var i = 0; i < body.length; ++i) {
+			body[i] = back ? [-body[i][1], body[i][0]] : [body[i][1], -body[i][0]];
 		}
-		if (this.id == 3 || this.id == 4 || this.id == 5)
-			this.back = !this.back;
+		if (id == 3 || id == 4 || id == 5)
+			back = !back;
 	}
 
 	this.drop = function() {
