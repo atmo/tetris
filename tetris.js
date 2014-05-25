@@ -42,18 +42,16 @@ function drawPixel(x, y) {
 function onKeyPressed(event) {
 	switch (event.keyCode) {
 		case 37: // left
-			figure.moveLeft();
-			if (figure.checkBound(width))
-				figure.moveRight();
+			if (!figure.checkBound(-1))
+				figure.moveLeft();
 			break;
 		case 39: // right
-			figure.moveRight();
-			if (figure.checkBound(width))
-				figure.moveLeft();
+			if (!figure.checkBound(1))
+				figure.moveRight();
 			break;
 		case 38: // up
 			figure.rotate();
-			if (figure.checkBound(width))
+			if (figure.checkBound(0))
 				figure.rotate(true);
 			break;
 		case 40: //down
@@ -120,9 +118,9 @@ function Figure() {
 		}
 	}
 
-	this.checkBound = function(width) {
+	this.checkBound = function(shift) {
 		for (var i = 0; i < body.length; ++i) {
-			if (x + body[i][0] < 0 || x + body[i][0] >= width)
+			if (x + body[i][0] + shift < 0 || x + body[i][0] + shift >= width)
 				return true;
 		}
 		return false;
