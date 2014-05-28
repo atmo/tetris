@@ -19,6 +19,8 @@ function init() {
 	document.addEventListener("keydown", onKeyPressed);
 
 	context = canvas.getContext('2d');
+	board = new Board(width, height);
+	board.init();
 	figure = new Figure();
 
 	setInterval(run, 400);
@@ -42,28 +44,52 @@ function drawPixel(x, y) {
 function onKeyPressed(event) {
 	switch (event.keyCode) {
 		case 37: // left
-			if (!figure.checkBound(-1))
+			if (!figure.checkBound(-1) && !board.checkOccupied(-1, 0))
 				figure.moveLeft();
 			break;
 		case 39: // right
-			if (!figure.checkBound(1))
+			if (!figure.checkBound(1) && !board.checkOccupied(1, 0))
 				figure.moveRight();
 			break;
 		case 38: // up
 			figure.rotate();
-			if (figure.checkBound(0))
+			if (figure.checkBound(0) || board.checkOccupied(0, 0))
 				figure.rotate(true);
 			break;
 		case 40: //down
-			figure.drop();
+			while (!board.checkOccupied(0, 1))
+				figure.drop();
 			break;
+	}
+}
+
+
+
+function Board(width, height) {
+	var field = [];
+	this.init = function() {
+		field = new Array(height);
+		for (var i = 0; i < height; ++i) {
+			field[i] = new Array(width);
+			for (var j = 0; j < width; ++j)
+				field[i][j] = 0;
+		}
+	}
+
+	this.checkOccupied = function(dx, dy) {
+		for (var i = 0; i < 4; ++i) {
+			var pos = figure.getBody(i);
+			if (field[pos[0] + dx][pos[1] + dy] || pos[1] + dy > height)
+				return true;
+		}
+		return false;
 	}
 }
 
 function Figure() {
 	var id = Math.floor(Math.random() * figuresCount);
-	var x = width / 2;
-	var y = 0;
+	var x = width / 2,
+		y = 0;
 	var back = false;
 	var pixel = pixel;
 	var bodies = [
@@ -141,6 +167,10 @@ function Figure() {
 		}
 		if (id == 3 || id == 4 || id == 5)
 			back = !back;
+	}
+
+	this.getBody = function(index) {
+		return [x + body[index][0], y + body[index][1]];
 	}
 
 	this.drop = function() {
