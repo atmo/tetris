@@ -23,16 +23,21 @@ function init() {
 	board.init();
 	figure = new Figure();
 
-	setInterval(run, 400);
+	setInterval(update, 400);
+	setInterval(redraw, 1000 / 60);
 }
 
-function run() {
-	context.fillStyle = "white";
-	context.fillRect(0, 0, canvas.width, canvas.height);
-
-	figure.draw(context);
+function update() {
 	figure.drop();
 }
+
+function redraw() {
+	context.fillStyle = "white";
+	context.fillRect(0, 0, canvas.width, canvas.height);
+	figure.draw();
+	board.draw();
+}
+
 
 function drawPixel(x, y) {
 	context.fillStyle = "black";
@@ -83,6 +88,15 @@ function Board(width, height) {
 				return true;
 		}
 		return false;
+	}
+
+	this.draw = function() {
+		for (var i = 0; i < height; ++i) {
+			for (var j = 0; j < width; ++j) {
+				if (field[j][i])
+					drawPixel(j, i);
+			}
+		}
 	}
 }
 
