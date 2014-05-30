@@ -28,6 +28,10 @@ function init() {
 }
 
 function update() {
+	if (board.checkOccupied(0, 1)) {
+		board.merge(figure);
+		figure = new Figure();
+	}
 	figure.drop();
 }
 
@@ -74,27 +78,34 @@ function Board(width, height) {
 	var field = [];
 	this.init = function() {
 		field = new Array(height);
-		for (var i = 0; i < height; ++i) {
-			field[i] = new Array(width);
-			for (var j = 0; j < width; ++j)
-				field[i][j] = 0;
+		for (var y = 0; y < height; ++y) {
+			field[y] = new Array(width);
+			for (var x = 0; x < width; ++x)
+				field[y][x] = 0;
 		}
 	}
 
 	this.checkOccupied = function(dx, dy) {
 		for (var i = 0; i < 4; ++i) {
 			var pos = figure.getBody(i);
-			if (field[pos[0] + dx][pos[1] + dy] || pos[1] + dy > height)
+			if (pos[1] + dy >= height || field[pos[1] + dy][pos[0] + dx])
 				return true;
 		}
 		return false;
 	}
 
+	this.merge = function(figure) {
+		for (var i = 0; i < 4; ++i) {
+			var pos = figure.getBody(i);
+			field[pos[1]][pos[0]] = 1
+		}
+	}
+
 	this.draw = function() {
-		for (var i = 0; i < height; ++i) {
-			for (var j = 0; j < width; ++j) {
-				if (field[j][i])
-					drawPixel(j, i);
+		for (var y = 0; y < height; ++y) {
+			for (var x = 0; x < width; ++x) {
+				if (field[y][x])
+					drawPixel(x, y);
 			}
 		}
 	}
