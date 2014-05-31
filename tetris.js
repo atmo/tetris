@@ -31,6 +31,7 @@ function update() {
 	if (board.checkOccupied(0, 1)) {
 		board.merge(figure);
 		figure = new Figure();
+		board.clearLines();
 	}
 	figure.drop();
 }
@@ -106,6 +107,28 @@ function Board(width, height) {
 			for (var x = 0; x < width; ++x) {
 				if (field[y][x])
 					drawPixel(x, y);
+			}
+		}
+	}
+
+	this.clearLines = function() {
+		var hasFull = true;
+		while (hasFull) {
+			hasFull = false;
+			for (var y = 0; y < height; ++y) {
+				var full = true;
+				for (var x = 0; x < width; ++x)
+					if (!field[y][x]) {
+						full = false;
+						break;
+					}
+				if (full) {
+					field.slice(y, 1);
+					field.unshift(new Array(width))
+					for (var x = 0; x < width; ++x)
+						field[0][x] = 0;
+				}
+				hasFull |= full;
 			}
 		}
 	}
