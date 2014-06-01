@@ -12,9 +12,14 @@
 <body>
   <h3>Tetris</h3>
   <div class="inner">
-    <div>
-      <canvas id="canvas">
-      </canvas>
+    <div id="columns">
+      <div id="canvas_column">
+        <canvas id="canvas">
+        </canvas>
+      </div>
+      <div id="score_column">
+        Score: <label id="score">0</label>
+      </div>
     </div>
   </div>  
   <script language='javascript' src='tetris.js'></script>

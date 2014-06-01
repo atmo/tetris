@@ -6,3 +6,21 @@
 body{
   overflow:hidden
 }
+
+#columns {
+  margin: 0 auto;
+  display: inline-block;
+}
+
+#canvas_column {
+  float:left;
+  margin: 10px;
+  width: 400px;
+  display: inline-block;
+}
+
+#score_column {
+  text-align:right;
+  margin: 10px;
+  display: inline-block;
+}

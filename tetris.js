@@ -7,6 +7,7 @@ var width = 10,
 var width, height;
 
 var figuresCount = 7;
+var scoreLabel;
 
 window.onload = init();
 
@@ -17,6 +18,7 @@ function init() {
 	canvas.height = height * pixel;
 
 	document.addEventListener("keydown", onKeyPressed);
+	scoreLabel = document.getElementById("score");
 
 	context = canvas.getContext('2d');
 	board = new Board(width, height);
@@ -31,7 +33,7 @@ function update() {
 	if (board.checkOccupied(0, 1)) {
 		board.merge(figure);
 		figure = new Figure();
-		board.clearLines();
+		scoreLabel.textContent = parseInt(scoreLabel.textContent, 10) + board.clearLines();
 	}
 	figure.drop();
 }
@@ -89,6 +91,8 @@ function Board(width, height) {
 	this.checkOccupied = function(dx, dy) {
 		for (var i = 0; i < 4; ++i) {
 			var pos = figure.getBody(i);
+			if (pos[1] + dy < 0)
+				continue;
 			if (pos[1] + dy >= height || field[pos[1] + dy][pos[0] + dx])
 				return true;
 		}
@@ -111,33 +115,40 @@ function Board(width, height) {
 		}
 	}
 
-	this.clearLines = function() {
-		var hasFull = true;
-		while (hasFull) {
-			hasFull = false;
-			for (var y = 0; y < height; ++y) {
-				var full = true;
-				for (var x = 0; x < width; ++x)
-					if (!field[y][x]) {
-						full = false;
-						break;
-					}
-				if (full) {
-					field.slice(y, 1);
-					field.unshift(new Array(width))
-					for (var x = 0; x < width; ++x)
-						field[0][x] = 0;
+	this.checkFull = function() {
+		for (var y = 0; y < height; ++y) {
+			var full = true;
+			for (var x = 0; x < width; ++x)
+				if (!field[y][x]) {
+					full = false;
+					break;
 				}
-				hasFull |= full;
+			if (full) {
+				return y;
 			}
 		}
+		return -1;
+	}
+
+	this.clearLines = function() {
+		var line;
+		var score = 0,
+			multiplier = 0;
+		while ((line = this.checkFull()) != -1) {
+			field.splice(line, 1);
+			field.unshift(new Array(width))
+			for (var x = 0; x < width; ++x)
+				field[0][x] = 0;
+			multiplier = multiplier * 2 + 1;
+		}
+		return 100 * multiplier;
 	}
 }
 
 function Figure() {
 	var id = Math.floor(Math.random() * figuresCount);
 	var x = width / 2,
-		y = 0;
+		y = -1;
 	var back = false;
 	var pixel = pixel;
 	var bodies = [
