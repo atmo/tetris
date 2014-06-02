@@ -25,7 +25,7 @@ function init() {
 	board.init();
 	figure = new Figure();
 
-	setInterval(update, 400);
+	setInterval(update, 500);
 	setInterval(redraw, 1000 / 60);
 }
 
@@ -72,6 +72,8 @@ function onKeyPressed(event) {
 			while (!board.checkOccupied(0, 1))
 				figure.drop();
 			break;
+		default:
+			//console.log(event.keyCode);
 	}
 }
 
@@ -153,10 +155,10 @@ function Figure() {
 	var pixel = pixel;
 	var bodies = [
 		[
+			[0, -2], // O
 			[0, -1], // O
-			[0, 0], //  O
-			[0, 1], //  X
-			[0, 2] //   O
+			[0, 0], //  X
+			[0, 1] //   O
 		],
 		[
 			[-1, 1], // OO  
@@ -171,20 +173,20 @@ function Figure() {
 			[0, -1]
 		],
 		[
-			[1, 1], // OO
-			[1, 0], // XO
-			[0, 1],
-			[0, 0]
+			[0, 1], // OO
+			[1, 1], // XO
+			[0, 0],
+			[1, 0]
 		],
 		[
-			[1, 1], //  OO
-			[0, 1], // Ox
+			[1, -1], //  OO
+			[0, -1], // Ox
 			[0, 0],
 			[-1, 0]
 		],
 		[
-			[-1, 1], // OO    
-			[0, 1], //   XO
+			[-1, -1], // OO    
+			[0, -1], //   XO
 			[0, 0],
 			[1, 0]
 		],
@@ -220,12 +222,18 @@ function Figure() {
 	}
 
 	this.rotate = function(b) {
-		back = back || b;
-		for (var i = 0; i < body.length; ++i) {
-			body[i] = back ? [-body[i][1], body[i][0]] : [body[i][1], -body[i][0]];
-		}
-		if (id == 3 || id == 4 || id == 5)
+		if (id == 0 || id == 4 || id == 5) {
+			for (var i = 0; i < body.length; ++i) {
+				body[i] = back ? [-body[i][1], body[i][0]] : [body[i][1], -body[i][0]];
+			}
 			back = !back;
+		} else if (id != 3) {
+			b = back || b;
+			for (var i = 0; i < body.length; ++i) {
+				body[i] = b ? [body[i][1], -body[i][0]] : [-body[i][1], body[i][0]];
+			}
+		}
+
 	}
 
 	this.getBody = function(index) {
