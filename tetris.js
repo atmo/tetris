@@ -1,13 +1,13 @@
 var pixel = 40;
 var canvas, context;
 
-var figure;
+var figure, board;
 var width = 10,
 	height = 15;
-var width, height;
 
 var figuresCount = 7;
 var scoreLabel;
+var compute;
 
 window.onload = init();
 
@@ -25,7 +25,7 @@ function init() {
 	board.init();
 	figure = new Figure();
 
-	setInterval(update, 500);
+	compute = setInterval(update, 500);
 	setInterval(redraw, 1000 / 60);
 }
 
@@ -33,6 +33,10 @@ function update() {
 	if (board.checkOccupied(0, 1)) {
 		board.merge(figure);
 		figure = new Figure();
+		if (board.checkOccupied(0, 1)) {
+			alert("Game over!");
+			window.clearInterval(compute);
+		}
 		scoreLabel.textContent = parseInt(scoreLabel.textContent, 10) + board.clearLines();
 	}
 	figure.drop();
